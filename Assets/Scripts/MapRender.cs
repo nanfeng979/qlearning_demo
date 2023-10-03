@@ -7,7 +7,7 @@ public class MapRender : MonoBehaviour
     [SerializeField] private int row;
     [SerializeField] private int col;
 
-    private int[,] map = {{0, 3, 0, 0}, {0, 3, 0, 0}, {0, 0, 3, 0}, {0, 0, 0, 0}};
+    private int[,] map = {{2, 0, 0, 0}, {0, 3, 0, 3}, {0, 0, 0, 3}, {3, 0, 0, 1}};
 
     [SerializeField] private GameObject caodi;
     [SerializeField] private GameObject goal;
@@ -34,7 +34,7 @@ public class MapRender : MonoBehaviour
                     default:
                         break;
                 }
-                Instantiate(obj, new Vector3(j - col / 2, i - row / 2, 0), Quaternion.identity, transform);
+                Instantiate(obj, new Vector3(j - col / 2, -1 * (i - row / 2), 0), Quaternion.identity, transform);
             }
         }
     }
