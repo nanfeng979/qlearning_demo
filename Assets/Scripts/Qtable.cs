@@ -51,4 +51,16 @@ public class Qtable : MonoBehaviour
         }
         return action;
     }
+
+    private int epsilon_greedy_policy(int[,] table, int state, float epsilon) {
+        float random_num = Random.Range(0f, 1f);
+        if (random_num > epsilon) {
+            int action = greedy_policy(table, state);
+            return action;
+        }
+        else {
+            int action = Random.Range(0, 4);
+            return action;
+        }
+    }
 }
