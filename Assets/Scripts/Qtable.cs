@@ -40,4 +40,15 @@ public class Qtable : MonoBehaviour
         }
         Debug.Log(s);
     }
+
+    // state count = raw * col = 4 * 4
+    private int greedy_policy(int[,] table, int state) {
+        int action = table[state, 0];
+        for (int i = 1; i < 4; i++) {
+            if (table[state, i] > action) {
+                action = table[state, i];
+            }
+        }
+        return action;
+    }
 }
