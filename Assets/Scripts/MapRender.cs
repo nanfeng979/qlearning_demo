@@ -7,10 +7,15 @@ public class MapRender : MonoBehaviour
     [SerializeField] private int row;
     [SerializeField] private int col;
 
-    private int[,] initMap = {{2, 0, 0, 0}, {0, 3, 0, 3}, {0, 0, 0, 3}, {3, 0, 0, 1}};
-    private int[,] map = {{2, 0, 0, 0}, {0, 3, 0, 3}, {0, 0, 0, 3}, {3, 0, 0, 1}};
+    private int[,] initMap = {
+                              {2, 0, 0, 0}, 
+                              {3, 3, 0, 3}, 
+                              {3, 0, 0, 3}, 
+                              {3, 0, 0, 1}
+                                          };
+    private int[,] map;
     private int[] initPlayerPos = {0, 0};
-    private int[] playerPos = {0, 0}; 
+    private int[] playerPos; 
     private GameObject[,] mapObjects = new GameObject[4, 4];
     private SpriteRenderer[] mapRenderers = new SpriteRenderer[4];
 
@@ -20,6 +25,9 @@ public class MapRender : MonoBehaviour
     [SerializeField] private GameObject xianjin; // 3
 
     private void Awake() {
+        map = initMap;
+        playerPos = initPlayerPos;
+        
         mapRenderers[0] = caodi.GetComponent<SpriteRenderer>();
         mapRenderers[1] = goal.GetComponent<SpriteRenderer>();
         mapRenderers[2] = player.GetComponent<SpriteRenderer>();
@@ -62,9 +70,19 @@ public class MapRender : MonoBehaviour
         }
     }
 
+    private void showMap() {
+        string s = "";
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                s += map[i, j] + " ";
+            }
+            s += "\n";
+        }
+        Debug.Log(s);
+    }
+
     public void SetMap(int i, int j, int value) {
         map[i, j] = value;
-        playerPos = initPlayerPos;
     }
 
     public int[,] GetMap() {
@@ -73,23 +91,16 @@ public class MapRender : MonoBehaviour
 
     private void ResetMap() {
         map = initMap;
+        playerPos = initPlayerPos;
     }
 
     public int[] GetPlayerPos() {
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                if (map[i, j] == 2) {
-                    return new int[] { i, j };
-                }
-            }
-        }
         return playerPos;
     }
 
-    public void SetPlayerPos(int[] newPos) {
-        int[] playerOldPos = playerPos;
-        playerPos = newPos;
-        map[playerPos[0], playerPos[1]] = 2;
-        map[playerOldPos[0], playerOldPos[1]] = 0;
+    public void SetPlayerPos(int[] playerNewPos) {
+        SetMap(playerPos[0], playerPos[1], 0);
+        SetMap(playerNewPos[0], playerNewPos[1], 2);
+        playerPos = playerNewPos;
     }
 }

@@ -141,19 +141,33 @@ public class Qtable : MonoBehaviour
     }
 
     private void MovePlayer(int action) {
-        if (action == 0) {
-            int[] playerOldPos = map.GetPlayerPos();
-            int[] playerNewPos = playerOldPos;
-            playerNewPos[1] = playerNewPos[1] + 1;
-            Debug.Log(playerNewPos[0]);
-            Debug.Log(playerNewPos[1]);
-            map.SetPlayerPos(playerNewPos);
+        int[] playerNewPos = new int[2];
+        for (int i = 0; i < 2; i++) {
+            playerNewPos[i] = map.GetPlayerPos()[i];
         }
+
+        if (action == 0) {
+            playerNewPos[1]++;
+        } else if (action == 1) {
+            playerNewPos[0]++;            
+        } else if (action == 2) {
+            playerNewPos[1]--;
+        } else if (action == 3) {
+            playerNewPos[0]--;
+        }
+
+        map.SetPlayerPos(playerNewPos);
     }
 
     private void test() {
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
             MovePlayer(0);
+        } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
+            MovePlayer(1);
+        } else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
+            MovePlayer(2);
+        } else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) {
+            MovePlayer(3);
         }
     }
 }
