@@ -16,12 +16,16 @@ public class Qtable : MonoBehaviour
 
     public float[,] qtable = new float[16, 4];
 
+    private float[,] IEQtable = new float[16, 4];
+
     // params
-    private int n_training_episodes = 10000;
+    // private int n_training_episodes = 10000;
+    private int n_training_episodes = 100;
     private float learning_rate = 0.7f;
     private int n_eval_episodes = 100;
     private string env_id = "FrozenLake-v1";
-    private int max_steps = 99;
+    // private int max_steps = 99;
+    private int max_steps = 5;
     private float gamma = 0.95f;
     private int[] eval_seed = {};
     private float max_epsilon = 1.0f;
@@ -36,14 +40,51 @@ public class Qtable : MonoBehaviour
     void Start()
     {
         // showTable(qtable);
-
         // qtable = train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, "env", max_steps, qtable);
+
+        StartCoroutine(trainWithIE(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env_id, max_steps, IEQtable));
+        showTable(IEQtable);
     }
 
     // Update is called once per frame
     void Update()
     {
         test();
+    }
+
+    IEnumerator trainWithIE (int n_training_episodes, float min_epsilon, float max_epsilon, float decay_rate, string env, int max_steps, float[,] qtable) {
+        for (int episode = 0; episode < n_training_episodes; episode++) {
+            var epsilon = min_epsilon + (max_epsilon - min_epsilon) * Mathf.Exp(-decay_rate * episode);
+            int state = 0; // todo: 随机位置。0表示在左上角
+            bool terminated = false;
+
+            for (int step = 0; step < max_steps; step++) {
+                int action = epsilon_greedy_policy(qtable, state, epsilon);
+
+                StepInfo stepInfo = Step(action, state);
+                var new_state = stepInfo.new_state;
+                var reward = stepInfo.reward;
+                terminated = stepInfo.terminated;
+
+                yield return new WaitForSeconds(0.5f);
+
+                float [] qtable_state = new float[4];
+                for (int action_index = 0; action_index < 4; action_index++) {
+                    qtable_state[action_index] = qtable[state, action_index];
+                }
+
+                qtable[state, action] = qtable[state, action] + learning_rate * (reward + gamma * QtableStateMaxAction(qtable_state) - qtable[state, action]);
+
+                if (terminated) {
+                    break;
+                }
+
+                state = new_state;
+            }
+            map.ResetMap();
+        }
+
+        IEQtable = qtable;
     }
 
     private void initTable(float[,] table) {
@@ -100,7 +141,7 @@ public class Qtable : MonoBehaviour
             for (int step = 0; step < max_steps; step++) {
                 int action = epsilon_greedy_policy(qtable, state, epsilon);
 
-                StepInfo stepInfo = Step(action);
+                StepInfo stepInfo = Step(action, state);
                 var new_state = stepInfo.new_state;
                 var reward = stepInfo.reward;
                 terminated = stepInfo.terminated;
@@ -118,6 +159,7 @@ public class Qtable : MonoBehaviour
 
                 state = new_state;
             }
+            map.ResetMap();
         }
 
         return qtable;
@@ -133,9 +175,16 @@ public class Qtable : MonoBehaviour
         return max;
     }
 
-    private StepInfo Step(int action) {
-        // todo
+    private StepInfo Step(int action, int currentState) {
+        MovePlayer(action);
         StepInfo info = new StepInfo();
+
+        info.new_state = map.GetPlayerPosIndex();
+        info.reward = map.GetReward();
+        info.terminated = map.IsTerminated();
+
+        info.truncated = false;
+        info.info = null;
 
         return info;
     }

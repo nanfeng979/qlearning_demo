@@ -9,8 +9,8 @@ public class MapRender : MonoBehaviour
 
     private int[,] initMap = {
                               {2, 0, 0, 0}, 
-                              {3, 3, 0, 3}, 
-                              {3, 0, 0, 3}, 
+                              {0, 3, 0, 3}, 
+                              {0, 0, 0, 3}, 
                               {3, 0, 0, 1}
                                           };
     private int[,] map;
@@ -85,13 +85,13 @@ public class MapRender : MonoBehaviour
         // 当player位置改变时，判断是否踩到陷阱或者到达终点
         switch (map[i, j]) {
             case 0:
-                Debug.Log("踩到草地");
+                // Debug.Log("踩到草地");
                 break;
             case 1:
-                Debug.Log("到达终点");
+                // Debug.Log("到达终点");
                 break;
             case 3:
-                Debug.Log("踩到陷阱");
+                // Debug.Log("踩到陷阱");
                 break;
         }
 
@@ -102,13 +102,18 @@ public class MapRender : MonoBehaviour
         return map;
     }
 
-    private void ResetMap() {
+    public void ResetMap() {
+        Debug.Log("reset");
         map = initMap;
         playerPos = initPlayerPos;
     }
 
     public int[] GetPlayerPos() {
         return playerPos;
+    }
+
+    public int GetPlayerPosIndex() {
+        return playerPos[0] * col + playerPos[1];
     }
 
     public void SetPlayerPos(int[] playerNewPos) {
@@ -118,36 +123,72 @@ public class MapRender : MonoBehaviour
     }
 
     public void SetPlayerPos(int action) {
+        // StepInfo info = new StepInfo();
+
+        // info.new_state = GetPlayerPosIndex();
+        // info.reward = GetReward();
+        // info.terminated = IsTerminated();
+
+        // info.truncated = false;
+        // info.info = null;
+
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
             playerNewPos[i] = playerPos[i];
         }
 
+        bool flag = true;
+
         if (action == 0) {
             if (playerNewPos[1] + 1 >= col) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[1]++;
             }
-            playerNewPos[1]++;
+            
         } else if (action == 1) {
             if (playerNewPos[0] + 1 >= row) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[0]++;
             }
-            playerNewPos[0]++;            
         } else if (action == 2) {
             if (playerNewPos[1] - 1 < 0) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[1]--;
             }
-            playerNewPos[1]--;
         } else if (action == 3) {
             if (playerNewPos[0] - 1 < 0) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[0]--;
             }
-            playerNewPos[0]--;
         }
 
-        SetMap(playerPos[0], playerPos[1], 0);
-        SetMap(playerNewPos[0], playerNewPos[1], 2);
+        if (flag) {
+            SetMap(playerPos[0], playerPos[1], 0);
+            SetMap(playerNewPos[0], playerNewPos[1], 2);
+            playerPos = playerNewPos;
+        }
+
+        // SetMap(playerPos[0], playerPos[1], 0);
+        // SetMap(playerNewPos[0], playerNewPos[1], 2);
         
-        playerPos = playerNewPos;
+        // playerPos = playerNewPos;
+    }
+
+    public int GetReward() {
+        if (map[playerPos[0], playerPos[1]] == 1 || map[playerPos[0], playerPos[1]] == 3) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public bool IsTerminated() {
+        if (map[playerPos[0], playerPos[1]] == 1) {
+            return true;
+        }
+        return false;
     }
 }
