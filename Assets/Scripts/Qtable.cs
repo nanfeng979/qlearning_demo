@@ -12,6 +12,8 @@ struct StepInfo {
 
 public class Qtable : MonoBehaviour
 {
+    [SerializeField] private MapRender map;
+
     public float[,] qtable = new float[16, 4];
 
     // params
@@ -41,7 +43,7 @@ public class Qtable : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        test();
     }
 
     private void initTable(float[,] table) {
@@ -64,7 +66,7 @@ public class Qtable : MonoBehaviour
     }
 
     // state count = raw * col = 4 * 4
-    // action = up, down, left, right = 0, 1, 2, 3
+    // action = right, down, left, up = 0, 1, 2, 3
     private int greedy_policy(float[,] table, int state) {
         int action = 0;
         float max = table[state, action];
@@ -133,7 +135,25 @@ public class Qtable : MonoBehaviour
 
     private StepInfo Step(int action) {
         // todo
+        StepInfo info = new StepInfo();
 
-        return new StepInfo();
+        return info;
+    }
+
+    private void MovePlayer(int action) {
+        if (action == 0) {
+            int[] playerOldPos = map.GetPlayerPos();
+            int[] playerNewPos = playerOldPos;
+            playerNewPos[1] = playerNewPos[1] + 1;
+            Debug.Log(playerNewPos[0]);
+            Debug.Log(playerNewPos[1]);
+            map.SetPlayerPos(playerNewPos);
+        }
+    }
+
+    private void test() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            MovePlayer(0);
+        }
     }
 }
