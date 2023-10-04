@@ -19,13 +19,11 @@ public class Qtable : MonoBehaviour
     private float[,] IEQtable = new float[16, 4];
 
     // params
-    // private int n_training_episodes = 10000;
-    private int n_training_episodes = 100;
+    private int n_training_episodes = 10000;
     private float learning_rate = 0.7f;
     private int n_eval_episodes = 100;
     private string env_id = "FrozenLake-v1";
-    // private int max_steps = 99;
-    private int max_steps = 5;
+    private int max_steps = 99;
     private float gamma = 0.95f;
     private int[] eval_seed = {};
     private float max_epsilon = 1.0f;
@@ -43,7 +41,7 @@ public class Qtable : MonoBehaviour
         // qtable = train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, "env", max_steps, qtable);
 
         StartCoroutine(trainWithIE(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env_id, max_steps, IEQtable));
-        showTable(IEQtable);
+        
     }
 
     // Update is called once per frame
@@ -62,11 +60,19 @@ public class Qtable : MonoBehaviour
                 int action = epsilon_greedy_policy(qtable, state, epsilon);
 
                 StepInfo stepInfo = Step(action, state);
+
+                // if (n_training_episodes < 9000) {
+                //     yield return null;
+                // } else {
+                //     yield return new WaitForSeconds(0.2f);
+                // }
+
+                yield return null;
+
                 var new_state = stepInfo.new_state;
                 var reward = stepInfo.reward;
                 terminated = stepInfo.terminated;
 
-                yield return new WaitForSeconds(0.5f);
 
                 float [] qtable_state = new float[4];
                 for (int action_index = 0; action_index < 4; action_index++) {
@@ -80,11 +86,14 @@ public class Qtable : MonoBehaviour
                 }
 
                 state = new_state;
+                Debug.Log(state);
             }
             map.ResetMap();
+            showTable(IEQtable);
         }
 
         IEQtable = qtable;
+        showTable(IEQtable);
     }
 
     private void initTable(float[,] table) {

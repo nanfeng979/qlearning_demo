@@ -13,11 +13,14 @@ public class MapRender : MonoBehaviour
                               {0, 0, 0, 3}, 
                               {3, 0, 0, 1}
                                           };
-    private int[,] map;
+    private int[,] map = new int[4, 4];
     private int[] initPlayerPos = {0, 0};
-    private int[] playerPos; 
+    private int[] playerPos = {0, 0}; 
     private GameObject[,] mapObjects = new GameObject[4, 4];
     private SpriteRenderer[] mapRenderers = new SpriteRenderer[4];
+
+    private int currentReward;
+    private bool isTerminated;
 
     [SerializeField] private GameObject caodi; // 0
     [SerializeField] private GameObject goal; // 1
@@ -25,8 +28,7 @@ public class MapRender : MonoBehaviour
     [SerializeField] private GameObject xianjin; // 3
 
     private void Awake() {
-        map = initMap;
-        playerPos = initPlayerPos;
+        ResetMap();
         
         mapRenderers[0] = caodi.GetComponent<SpriteRenderer>();
         mapRenderers[1] = goal.GetComponent<SpriteRenderer>();
@@ -104,8 +106,17 @@ public class MapRender : MonoBehaviour
 
     public void ResetMap() {
         Debug.Log("reset");
-        map = initMap;
-        playerPos = initPlayerPos;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                map[i, j] = initMap[i, j];
+            }
+        }
+
+        for (int i = 0; i < 2; i++) {
+            playerPos[i] = initPlayerPos[i];
+        }
+        currentReward = 0;
+        isTerminated = false;
     }
 
     public int[] GetPlayerPos() {
@@ -113,7 +124,7 @@ public class MapRender : MonoBehaviour
     }
 
     public int GetPlayerPosIndex() {
-        return playerPos[0] * col + playerPos[1];
+        return (int)((int)playerPos[0] * col + (int)playerPos[1]);
     }
 
     public void SetPlayerPos(int[] playerNewPos) {
@@ -141,32 +152,40 @@ public class MapRender : MonoBehaviour
 
         if (action == 0) {
             if (playerNewPos[1] + 1 >= col) {
-                flag = false;
-            } else {
-                playerNewPos[1]++;
+                return;
             }
+            playerNewPos[1]++;
             
         } else if (action == 1) {
             if (playerNewPos[0] + 1 >= row) {
-                flag = false;
-            } else {
-                playerNewPos[0]++;
+                return;
             }
+            playerNewPos[0]++;
         } else if (action == 2) {
             if (playerNewPos[1] - 1 < 0) {
-                flag = false;
-            } else {
-                playerNewPos[1]--;
+                return;
             }
+            playerNewPos[1]--;
         } else if (action == 3) {
             if (playerNewPos[0] - 1 < 0) {
-                flag = false;
-            } else {
-                playerNewPos[0]--;
+                return;
             }
+            playerNewPos[0]--;
         }
 
         if (flag) {
+            if (map[playerNewPos[0], playerNewPos[1]] == 1) {
+                Debug.Log("宝藏");
+                currentReward = 2;
+            }
+            else if (map[playerNewPos[0], playerNewPos[1]] == 3) {
+                Debug.Log("陷阱");
+                currentReward = -1;
+            }
+            if (map[playerNewPos[0], playerNewPos[1]] == 1 || map[playerNewPos[0], playerNewPos[1]] == 3) {
+                isTerminated = true;
+            }
+
             SetMap(playerPos[0], playerPos[1], 0);
             SetMap(playerNewPos[0], playerNewPos[1], 2);
             playerPos = playerNewPos;
@@ -179,16 +198,10 @@ public class MapRender : MonoBehaviour
     }
 
     public int GetReward() {
-        if (map[playerPos[0], playerPos[1]] == 1 || map[playerPos[0], playerPos[1]] == 3) {
-            return 1;
-        }
-        return 0;
+        return currentReward;
     }
 
     public bool IsTerminated() {
-        if (map[playerPos[0], playerPos[1]] == 1) {
-            return true;
-        }
-        return false;
+        return isTerminated;
     }
 }
