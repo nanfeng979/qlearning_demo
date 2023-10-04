@@ -141,22 +141,7 @@ public class Qtable : MonoBehaviour
     }
 
     private void MovePlayer(int action) {
-        int[] playerNewPos = new int[2];
-        for (int i = 0; i < 2; i++) {
-            playerNewPos[i] = map.GetPlayerPos()[i];
-        }
-
-        if (action == 0) {
-            playerNewPos[1]++;
-        } else if (action == 1) {
-            playerNewPos[0]++;            
-        } else if (action == 2) {
-            playerNewPos[1]--;
-        } else if (action == 3) {
-            playerNewPos[0]--;
-        }
-
-        map.SetPlayerPos(playerNewPos);
+        map.SetPlayerPos(action);
     }
 
     private void test() {
