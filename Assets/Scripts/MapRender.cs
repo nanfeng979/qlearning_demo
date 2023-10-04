@@ -84,6 +84,9 @@ public class MapRender : MonoBehaviour
     public void SetMap(int i, int j, int value) {
         // 当player位置改变时，判断是否踩到陷阱或者到达终点
         switch (map[i, j]) {
+            case 0:
+                Debug.Log("踩到草地");
+                break;
             case 1:
                 Debug.Log("到达终点");
                 break;
