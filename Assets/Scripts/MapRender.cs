@@ -111,12 +111,24 @@ public class MapRender : MonoBehaviour
         }
 
         if (action == 0) {
+            if (playerNewPos[1] + 1 >= col) {
+                return;
+            }
             playerNewPos[1]++;
         } else if (action == 1) {
+            if (playerNewPos[0] + 1 >= row) {
+                return;
+            }
             playerNewPos[0]++;            
         } else if (action == 2) {
+            if (playerNewPos[1] - 1 < 0) {
+                return;
+            }
             playerNewPos[1]--;
         } else if (action == 3) {
+            if (playerNewPos[0] - 1 < 0) {
+                return;
+            }
             playerNewPos[0]--;
         }
 
