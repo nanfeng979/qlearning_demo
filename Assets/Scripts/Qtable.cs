@@ -35,7 +35,7 @@ public class Qtable : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        showTable(qtable);
+        // showTable(qtable);
 
         // qtable = train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, "env", max_steps, qtable);
     }
