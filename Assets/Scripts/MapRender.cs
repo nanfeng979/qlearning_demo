@@ -19,6 +19,7 @@ public class MapRender : MonoBehaviour
     private GameObject[,] mapObjects = new GameObject[4, 4];
     private SpriteRenderer[] mapRenderers = new SpriteRenderer[4];
 
+    private int currentState;
     private int currentReward;
     private bool isTerminated;
 
@@ -104,7 +105,7 @@ public class MapRender : MonoBehaviour
         return map;
     }
 
-    public void ResetMap() {
+    public int ResetMap() {
         Debug.Log("reset");
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
@@ -117,6 +118,9 @@ public class MapRender : MonoBehaviour
         }
         currentReward = 0;
         isTerminated = false;
+
+        int state = 0; // todo: 随机
+        return state;
     }
 
     public int[] GetPlayerPos() {
@@ -124,67 +128,46 @@ public class MapRender : MonoBehaviour
     }
 
     public int GetNewState() {
-        return (int)((int)playerPos[0] * col + (int)playerPos[1]);
+        return currentState;
     }
 
-    public void SetPlayerPos(int[] playerNewPos) {
-        SetMap(playerPos[0], playerPos[1], 0);
-        SetMap(playerNewPos[0], playerNewPos[1], 2);
-        playerPos = playerNewPos;
-    }
-
-    public StepInfo SetPlayerPos(int action) {
+    public StepInfo SetPlayerPos(int action, int currentState) {
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
             playerNewPos[i] = playerPos[i];
         }
 
-        bool flag = true;
+        bool yueJie = false;
 
-        if (action == 0) {
-            if (playerNewPos[1] + 1 >= col) {
-                flag = false;
-            } else {
-                playerNewPos[1]++;
-            }
-        } else if (action == 1) {
-            if (playerNewPos[0] + 1 >= row) {
-                flag = false;
-            } else {
-                playerNewPos[0]++;
-            }
-        } else if (action == 2) {
-            if (playerNewPos[1] - 1 < 0) {
-                flag = false;
-            } else {
-                playerNewPos[1]--;
-            }
-        } else if (action == 3) {
-            if (playerNewPos[0] - 1 < 0) {
-                flag = false;
-            } else {
-                playerNewPos[0]--;
-            }
+        if (yueJie = isYueJie(action, currentState)) {
+            Debug.Log("yuejie");
+        } else {
+            currentState = MapUpdatePlayer(action, currentState);
+            Debug.Log("no yuejie");
         }
 
-        if (flag) {
-            if (map[playerNewPos[0], playerNewPos[1]] == 1) {
-                Debug.Log("宝藏");
-                currentReward = 1;
-            }
-            else if (map[playerNewPos[0], playerNewPos[1]] == 3) {
-                Debug.Log("陷阱");
-                currentReward = 0;
-            }
-            if (map[playerNewPos[0], playerNewPos[1]] == 1 || map[playerNewPos[0], playerNewPos[1]] == 3) {
-                isTerminated = true;
-            }
+        
 
-            SetMap(playerPos[0], playerPos[1], 0);
-            SetMap(playerNewPos[0], playerNewPos[1], 2);
-            playerPos = playerNewPos;
-        }
+        // if (!yueJie) {
+        //     if (map[playerNewPos[0], playerNewPos[1]] == 1) {
+        //         Debug.Log("宝藏");
+        //         currentReward = 1;
+        //     }
+        //     else if (map[playerNewPos[0], playerNewPos[1]] == 3) {
+        //         Debug.Log("陷阱");
+        //         currentReward = 0;
+        //     }
+        //     if (map[playerNewPos[0], playerNewPos[1]] == 1 || map[playerNewPos[0], playerNewPos[1]] == 3) {
+        //         isTerminated = true;
+        //     }
 
+        //     SetMap(playerPos[0], playerPos[1], 0);
+        //     SetMap(playerNewPos[0], playerNewPos[1], 2);
+        //     for (int i = 0; i < 2; i++) {
+        //         playerPos[i] = playerNewPos[i];
+        //     }
+        // }
+        
         StepInfo info = new StepInfo();
 
         info.new_state = GetNewState();
@@ -203,5 +186,75 @@ public class MapRender : MonoBehaviour
 
     public bool IsTerminated() {
         return isTerminated;
+    }
+
+    private bool isYueJie(int action, int state) {
+        int[] pos = StateToPos(state);
+        int x = pos[0];
+        int y = pos[1];
+
+        switch (action) {
+            case 0:
+                if (y + 1 >= row) {
+                    return true;
+                }
+                break;
+            case 1:
+                if (x + 1 >= col) {
+                    return true;
+                }
+                break;
+            case 2:
+                if (y - 1 < 0) {
+                    return true;
+                }
+                break;
+            case 3:
+                if (x - 1 < 0) {
+                    return true;
+                }
+                break;
+        }
+        return false;
+    }
+
+    private int MapUpdatePlayer(int action, int state) {
+        int[] pos = StateToPos(state);
+        int x = pos[0];
+        int y = pos[1];
+
+        map[x, y] = 0;
+        switch (action) {
+            case 0:
+                y += 1;
+                break;
+            case 1:
+                x += 1;
+                break;
+            case 2:
+                y -= 1;
+                break;
+            case 3:
+                x -= 1;
+                break;
+        }
+        map[x, y] = 2;
+
+        pos[0] = x;
+        pos[1] = y;
+
+        Debug.Log("current pos: x: " + pos[0] + " y: " + pos[1]);
+        Debug.Log("current state: " + PosToState(pos));
+        return PosToState(pos);
+    }
+
+    private int[] StateToPos(int state) {
+        int x = state % col;
+        int y = state / col;
+        return new int[] { x, y };
+    }
+
+    private int PosToState(int[] pos) {
+        return pos[0] * col + pos[1];
     }
 }

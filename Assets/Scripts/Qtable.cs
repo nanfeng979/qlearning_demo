@@ -19,7 +19,8 @@ public class Qtable : MonoBehaviour
     private float[,] IEQtable = new float[16, 4];
 
     // params
-    private int n_training_episodes = 10000;
+    // private int n_training_episodes = 10000;
+    private int n_training_episodes = 1000;
     private float learning_rate = 0.7f;
     private int n_eval_episodes = 100;
     private string env_id = "FrozenLake-v1";
@@ -29,6 +30,8 @@ public class Qtable : MonoBehaviour
     private float max_epsilon = 1.0f;
     private float min_epsilon = 0.05f;
     private float decay_rate = 0.0005f;
+
+    private int currentState = 0;
 
     private void Awake() {
         initTable(qtable);
@@ -40,7 +43,7 @@ public class Qtable : MonoBehaviour
         // showTable(qtable);
         // qtable = train(n_training_episodes, min_epsilon, max_epsilon, decay_rate, "env", max_steps, qtable);
 
-        StartCoroutine(trainWithIE(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env_id, max_steps, IEQtable));
+        // StartCoroutine(trainWithIE(n_training_episodes, min_epsilon, max_epsilon, decay_rate, env_id, max_steps, IEQtable));
         
     }
 
@@ -53,8 +56,7 @@ public class Qtable : MonoBehaviour
     IEnumerator trainWithIE (int n_training_episodes, float min_epsilon, float max_epsilon, float decay_rate, string env, int max_steps, float[,] qtable) {
         for (int episode = 0; episode < n_training_episodes; episode++) {
             var epsilon = min_epsilon + (max_epsilon - min_epsilon) * Mathf.Exp(-decay_rate * episode);
-            int state = 0; // todo: 随机位置。0表示在左上角
-            bool terminated = false;
+            int state = map.ResetMap(); // todo: 随机位置。0表示在左上角
 
             for (int step = 0; step < max_steps; step++) {
                 int action = epsilon_greedy_policy(qtable, state, epsilon);
@@ -66,12 +68,14 @@ public class Qtable : MonoBehaviour
                 // } else {
                 //     yield return new WaitForSeconds(0.2f);
                 // }
+                currentState = state;
 
-                yield return null;
+                yield return new WaitForSeconds(2f);
+                // yield return null;
 
-                var new_state = stepInfo.new_state;
-                var reward = stepInfo.reward;
-                terminated = stepInfo.terminated;
+                var new_state = stepInfo.new_state; //
+                var reward = stepInfo.reward; //
+                var terminated = stepInfo.terminated; //
 
 
                 float [] qtable_state = new float[4];
@@ -79,6 +83,7 @@ public class Qtable : MonoBehaviour
                     qtable_state[action_index] = qtable[state, action_index];
                 }
 
+                // QtableStateMaxAction(qtable_state) //
                 qtable[state, action] = qtable[state, action] + learning_rate * (reward + gamma * QtableStateMaxAction(qtable_state) - qtable[state, action]);
 
                 if (terminated) {
@@ -86,13 +91,15 @@ public class Qtable : MonoBehaviour
                 }
 
                 state = new_state;
-                Debug.Log(state);
+                currentState = state;
+                // Debug.Log(state);
             }
-            map.ResetMap();
-            showTable(IEQtable);
+            
+            // showTable(IEQtable);
         }
 
         IEQtable = qtable;
+        Debug.Log("训练完成");
         showTable(IEQtable);
     }
 
@@ -185,24 +192,26 @@ public class Qtable : MonoBehaviour
     }
 
     private StepInfo Step(int action, int currentState) {
-        StepInfo info = MovePlayer(action);
+        StepInfo info = MovePlayer(action, currentState);
 
         return info;
     }
 
-    private StepInfo MovePlayer(int action) {
-        return map.SetPlayerPos(action);
+    private StepInfo MovePlayer(int action, int currentState) {
+        return map.SetPlayerPos(action, currentState);
     }
 
     private void test() {
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
-            MovePlayer(0);
+            currentState = MovePlayer(0, currentState).new_state;
         } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
-            MovePlayer(1);
+            currentState = MovePlayer(1, currentState).new_state;
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
-            MovePlayer(2);
+            currentState = MovePlayer(2, currentState).new_state;
         } else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) {
-            MovePlayer(3);
+            currentState = MovePlayer(3, currentState).new_state;
         }
+
+        // Debug.Log("currentState: " + currentState);
     }
 }
