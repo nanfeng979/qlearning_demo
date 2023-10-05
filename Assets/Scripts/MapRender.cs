@@ -14,8 +14,6 @@ public class MapRender : MonoBehaviour
                               {3, 0, 0, 1}
                                           };
     private int[,] map = new int[4, 4];
-    private int[] initPlayerPos = {0, 0};
-    private int[] playerPos = {0, 0}; 
     private GameObject[,] mapObjects = new GameObject[4, 4];
     private SpriteRenderer[] mapRenderers = new SpriteRenderer[4];
 
@@ -61,7 +59,7 @@ public class MapRender : MonoBehaviour
     }
 
     private void Update() {
-        updateMayRender();
+        // updateMayRender();
     }
 
     private void updateMayRender() {
@@ -84,109 +82,44 @@ public class MapRender : MonoBehaviour
         Debug.Log(s);
     }
 
-    public void SetMap(int i, int j, int value) {
-        // 当player位置改变时，判断是否踩到陷阱或者到达终点
-        switch (map[i, j]) {
-            case 0:
-                // Debug.Log("踩到草地");
-                break;
-            case 1:
-                // Debug.Log("到达终点");
-                break;
-            case 3:
-                // Debug.Log("踩到陷阱");
-                break;
-        }
+    public StepInfo ResetMap() {
+        // Debug.Log("reset");
 
-        map[i, j] = value;
-    }
-
-    public int[,] GetMap() {
-        return map;
-    }
-
-    public int ResetMap() {
-        Debug.Log("reset");
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 map[i, j] = initMap[i, j];
             }
         }
 
-        for (int i = 0; i < 2; i++) {
-            playerPos[i] = initPlayerPos[i];
-        }
-
         currentState = 0; // todo: 随机
-        // currentReward = 0;
+        currentReward = 0;
         isTerminated = false;
 
-        return currentState;
-    }
+        StepInfo stepInfo = new StepInfo(currentState, currentReward, isTerminated, false, null);
 
-    public int[] GetPlayerPos() {
-        return playerPos;
-    }
-
-    public int GetNewState() {
-        return currentState;
+        return stepInfo;
     }
 
     public StepInfo SetPlayerPos(int action, int currentState) {
-        int[] playerNewPos = new int[2];
-        for (int i = 0; i < 2; i++) {
-            playerNewPos[i] = playerPos[i];
-        }
-
         bool yueJie = false;
 
         if (yueJie = isYueJie(action, currentState)) {
-            Debug.Log("yuejie");
+            // Debug.Log("yuejie");
         } else {
             currentState = MapUpdatePlayer(action, currentState);
-            Debug.Log("no yuejie");
+            // Debug.Log("no yuejie");
         }
-
-        
-
-        // if (!yueJie) {
-        //     if (map[playerNewPos[0], playerNewPos[1]] == 1) {
-        //         Debug.Log("宝藏");
-        //         currentReward = 1;
-        //     }
-        //     else if (map[playerNewPos[0], playerNewPos[1]] == 3) {
-        //         Debug.Log("陷阱");
-        //         currentReward = 0;
-        //     }
-        //     if (map[playerNewPos[0], playerNewPos[1]] == 1 || map[playerNewPos[0], playerNewPos[1]] == 3) {
-        //         isTerminated = true;
-        //     }
-
-        //     SetMap(playerPos[0], playerPos[1], 0);
-        //     SetMap(playerNewPos[0], playerNewPos[1], 2);
-        //     for (int i = 0; i < 2; i++) {
-        //         playerPos[i] = playerNewPos[i];
-        //     }
-        // }
         
         StepInfo info = new StepInfo();
 
         info.new_state = currentState;
-        info.reward = GetReward();
-        info.terminated = IsTerminated();
+        info.reward = currentReward;
+        info.terminated = isTerminated;
 
         info.truncated = false;
         info.info = null;
 
         return info;
-    }
-
-    public int GetReward() {
-        return currentReward;
-    }
-
-    public bool IsTerminated() {
-        return isTerminated;
     }
 
     private bool isYueJie(int action, int state) {
@@ -245,8 +178,8 @@ public class MapRender : MonoBehaviour
         pos[0] = x;
         pos[1] = y;
 
-        Debug.Log("current pos: x: " + pos[0] + " y: " + pos[1]);
-        Debug.Log("current state: " + PosToState(pos));
+        // Debug.Log("current pos: x: " + pos[0] + " y: " + pos[1]);
+        // Debug.Log("current state: " + PosToState(pos));
         return PosToState(pos);
     }
 
@@ -268,7 +201,7 @@ public class MapRender : MonoBehaviour
                 isTerminated = false;
                 break;
             case 1:
-                Debug.Log("goal");
+                // Debug.Log("goal");
                 currentReward = 1;
                 isTerminated = true;
                 break;
@@ -278,7 +211,7 @@ public class MapRender : MonoBehaviour
                 isTerminated = false;
                 break;
             case 3:
-                Debug.Log("xianjin");
+                // Debug.Log("xianjin");
                 currentReward = 0;
                 isTerminated = true;
                 break;
