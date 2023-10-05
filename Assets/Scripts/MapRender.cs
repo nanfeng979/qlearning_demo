@@ -170,11 +170,11 @@ public class MapRender : MonoBehaviour
         if (flag) {
             if (map[playerNewPos[0], playerNewPos[1]] == 1) {
                 Debug.Log("宝藏");
-                currentReward = 2;
+                currentReward = 1;
             }
             else if (map[playerNewPos[0], playerNewPos[1]] == 3) {
                 Debug.Log("陷阱");
-                currentReward = -1;
+                currentReward = 0;
             }
             if (map[playerNewPos[0], playerNewPos[1]] == 1 || map[playerNewPos[0], playerNewPos[1]] == 3) {
                 isTerminated = true;
