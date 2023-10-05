@@ -116,11 +116,12 @@ public class MapRender : MonoBehaviour
         for (int i = 0; i < 2; i++) {
             playerPos[i] = initPlayerPos[i];
         }
+
+        currentState = 0; // todo: 随机
         currentReward = 0;
         isTerminated = false;
 
-        int state = 0; // todo: 随机
-        return state;
+        return currentState;
     }
 
     public int[] GetPlayerPos() {
@@ -141,6 +142,7 @@ public class MapRender : MonoBehaviour
 
         if (yueJie = isYueJie(action, currentState)) {
             Debug.Log("yuejie");
+            currentState = 9;
         } else {
             currentState = MapUpdatePlayer(action, currentState);
             Debug.Log("no yuejie");
@@ -170,7 +172,7 @@ public class MapRender : MonoBehaviour
         
         StepInfo info = new StepInfo();
 
-        info.new_state = GetNewState();
+        info.new_state = currentState;
         info.reward = GetReward();
         info.terminated = IsTerminated();
 

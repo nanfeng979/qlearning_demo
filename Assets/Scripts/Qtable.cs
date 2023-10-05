@@ -204,6 +204,7 @@ public class Qtable : MonoBehaviour
     private void test() {
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
             currentState = MovePlayer(0, currentState).new_state;
+            Debug.Log("new state: " + currentState);
         } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
             currentState = MovePlayer(1, currentState).new_state;
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
