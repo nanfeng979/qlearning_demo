@@ -133,6 +133,11 @@ public class MapRender : MonoBehaviour
     }
 
     public StepInfo SetPlayerPos(int action, int currentState) {
+        // error
+        if (currentState == 999999) {
+            Debug.LogError("currentState == 999999");
+        }
+
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
             playerNewPos[i] = playerPos[i];
@@ -251,8 +256,8 @@ public class MapRender : MonoBehaviour
     }
 
     private int[] StateToPos(int state) {
-        int x = state % col;
-        int y = state / col;
+        int x = state / col;
+        int y = state % col;
         return new int[] { x, y };
     }
 
