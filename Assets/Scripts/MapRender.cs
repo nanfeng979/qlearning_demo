@@ -123,7 +123,7 @@ public class MapRender : MonoBehaviour
         return playerPos;
     }
 
-    public int GetPlayerPosIndex() {
+    public int GetNewState() {
         return (int)((int)playerPos[0] * col + (int)playerPos[1]);
     }
 
@@ -134,8 +134,6 @@ public class MapRender : MonoBehaviour
     }
 
     public StepInfo SetPlayerPos(int action) {
-        
-
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
             playerNewPos[i] = playerPos[i];
@@ -167,7 +165,6 @@ public class MapRender : MonoBehaviour
             } else {
                 playerNewPos[0]--;
             }
-            
         }
 
         if (flag) {
@@ -190,7 +187,7 @@ public class MapRender : MonoBehaviour
 
         StepInfo info = new StepInfo();
 
-        info.new_state = GetPlayerPosIndex();
+        info.new_state = GetNewState();
         info.reward = GetReward();
         info.terminated = IsTerminated();
 
