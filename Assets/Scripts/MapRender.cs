@@ -261,8 +261,27 @@ public class MapRender : MonoBehaviour
     }
 
     private void UpdatePlayer(int x, int y) {
-        if (map[x, y] == 1 || map[x, y] == 3) {
-            isTerminated = true;
+        switch (map[x, y]) {
+            case 0:
+                // Debug.Log("caodi");
+                currentReward = 0;
+                isTerminated = false;
+                break;
+            case 1:
+                Debug.Log("goal");
+                currentReward = 1;
+                isTerminated = true;
+                break;
+            case 2:
+                // Debug.Log("player");
+                currentReward = 0;
+                isTerminated = false;
+                break;
+            case 3:
+                Debug.Log("xianjin");
+                currentReward = 0;
+                isTerminated = true;
+                break;
         }
 
         map[x, y] = 2;

@@ -32,10 +32,11 @@ public class Qtable : MonoBehaviour
     private float decay_rate = 0.0005f;
 
     private int currentState = 0;
-    private StepInfo info = new StepInfo();
+    private StepInfo envInfo = new StepInfo();
 
     private void Awake() {
-        initTable(qtable);
+        initTable();
+        initInfo();
     }
 
     // Start is called before the first frame update
@@ -69,14 +70,14 @@ public class Qtable : MonoBehaviour
                 // } else {
                 //     yield return new WaitForSeconds(0.2f);
                 // }
-                currentState = state;
+                // currentState = state;
 
                 yield return new WaitForSeconds(2f);
                 // yield return null;
 
-                var new_state = stepInfo.new_state; //
-                var reward = stepInfo.reward; //
-                var terminated = stepInfo.terminated; //
+                envInfo.new_state = stepInfo.new_state; //
+                envInfo.reward = stepInfo.reward; //
+                envInfo.terminated = stepInfo.terminated; //
 
 
                 float [] qtable_state = new float[4];
@@ -85,14 +86,14 @@ public class Qtable : MonoBehaviour
                 }
 
                 // QtableStateMaxAction(qtable_state) //
-                qtable[state, action] = qtable[state, action] + learning_rate * (reward + gamma * QtableStateMaxAction(qtable_state) - qtable[state, action]);
+                qtable[state, action] = qtable[state, action] + learning_rate * (envInfo.reward + gamma * QtableStateMaxAction(qtable_state) - qtable[state, action]);
 
-                if (terminated) {
+                if (envInfo.terminated) {
                     break;
                 }
 
-                state = new_state;
-                currentState = state;
+                state = envInfo.new_state;
+                // currentState = state;
                 // Debug.Log(state);
             }
             
@@ -104,12 +105,20 @@ public class Qtable : MonoBehaviour
         showTable(IEQtable);
     }
 
-    private void initTable(float[,] table) {
+    private void initTable() {
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 4; j++) {
-                table[i, j] = 0;
+                qtable[i, j] = 0;
             }
         }
+    }
+
+    private void initInfo() {
+        envInfo.new_state = 0;
+        envInfo.reward = 0;
+        envInfo.terminated = false;
+        envInfo.truncated = false;
+        envInfo.info = null;
     }
 
     private void showTable(float[,] table) {
@@ -204,28 +213,27 @@ public class Qtable : MonoBehaviour
 
     private void test() {
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
-            info = MovePlayer(0, info.new_state);
+            envInfo = MovePlayer(0, envInfo.new_state);
         } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
-            info = MovePlayer(1, info.new_state);
+            envInfo = MovePlayer(1, envInfo.new_state);
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
-            info = MovePlayer(2, info.new_state);
+            envInfo = MovePlayer(2, envInfo.new_state);
         } else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) {
-            info = MovePlayer(3, info.new_state);
+            envInfo = MovePlayer(3, envInfo.new_state);
         }
 
-        if (info.terminated) {
+        if (envInfo.terminated) {
             ResetMap();
         }
 
-        // Debug.Log("currentState: " + currentState);
     }
 
     private void ResetMap() {
         map.ResetMap();
-        info.new_state = 0;
-        // info.reward = 0;
-        info.terminated = false;
-        info.truncated = false;
-        info.info = null;
+        envInfo.new_state = 0;
+        // envInfo.reward = 0;
+        envInfo.terminated = false;
+        envInfo.truncated = false;
+        envInfo.info = null;
     }
 }
