@@ -133,15 +133,8 @@ public class MapRender : MonoBehaviour
         playerPos = playerNewPos;
     }
 
-    public void SetPlayerPos(int action) {
-        // StepInfo info = new StepInfo();
-
-        // info.new_state = GetPlayerPosIndex();
-        // info.reward = GetReward();
-        // info.terminated = IsTerminated();
-
-        // info.truncated = false;
-        // info.info = null;
+    public StepInfo SetPlayerPos(int action) {
+        
 
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
@@ -152,25 +145,29 @@ public class MapRender : MonoBehaviour
 
         if (action == 0) {
             if (playerNewPos[1] + 1 >= col) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[1]++;
             }
-            playerNewPos[1]++;
-            
         } else if (action == 1) {
             if (playerNewPos[0] + 1 >= row) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[0]++;
             }
-            playerNewPos[0]++;
         } else if (action == 2) {
             if (playerNewPos[1] - 1 < 0) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[1]--;
             }
-            playerNewPos[1]--;
         } else if (action == 3) {
             if (playerNewPos[0] - 1 < 0) {
-                return;
+                flag = false;
+            } else {
+                playerNewPos[0]--;
             }
-            playerNewPos[0]--;
+            
         }
 
         if (flag) {
@@ -191,10 +188,16 @@ public class MapRender : MonoBehaviour
             playerPos = playerNewPos;
         }
 
-        // SetMap(playerPos[0], playerPos[1], 0);
-        // SetMap(playerNewPos[0], playerNewPos[1], 2);
-        
-        // playerPos = playerNewPos;
+        StepInfo info = new StepInfo();
+
+        info.new_state = GetPlayerPosIndex();
+        info.reward = GetReward();
+        info.terminated = IsTerminated();
+
+        info.truncated = false;
+        info.info = null;
+
+        return info;
     }
 
     public int GetReward() {

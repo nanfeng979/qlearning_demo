@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-struct StepInfo {
+public struct StepInfo {
     public int new_state;
     public float reward;
     public bool terminated;
@@ -185,21 +185,13 @@ public class Qtable : MonoBehaviour
     }
 
     private StepInfo Step(int action, int currentState) {
-        MovePlayer(action);
-        StepInfo info = new StepInfo();
-
-        info.new_state = map.GetPlayerPosIndex();
-        info.reward = map.GetReward();
-        info.terminated = map.IsTerminated();
-
-        info.truncated = false;
-        info.info = null;
+        StepInfo info = MovePlayer(action);
 
         return info;
     }
 
-    private void MovePlayer(int action) {
-        map.SetPlayerPos(action);
+    private StepInfo MovePlayer(int action) {
+        return map.SetPlayerPos(action);
     }
 
     private void test() {
