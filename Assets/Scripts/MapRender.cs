@@ -133,11 +133,6 @@ public class MapRender : MonoBehaviour
     }
 
     public StepInfo SetPlayerPos(int action, int currentState) {
-        // error
-        if (currentState == 999999) {
-            Debug.LogError("currentState == 999999");
-        }
-
         int[] playerNewPos = new int[2];
         for (int i = 0; i < 2; i++) {
             playerNewPos[i] = playerPos[i];
@@ -147,7 +142,6 @@ public class MapRender : MonoBehaviour
 
         if (yueJie = isYueJie(action, currentState)) {
             Debug.Log("yuejie");
-            currentState = 9;
         } else {
             currentState = MapUpdatePlayer(action, currentState);
             Debug.Log("no yuejie");
