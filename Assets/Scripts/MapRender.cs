@@ -118,7 +118,7 @@ public class MapRender : MonoBehaviour
         }
 
         currentState = 0; // todo: 随机
-        currentReward = 0;
+        // currentReward = 0;
         isTerminated = false;
 
         return currentState;
@@ -239,7 +239,8 @@ public class MapRender : MonoBehaviour
                 x -= 1;
                 break;
         }
-        map[x, y] = 2;
+
+        UpdatePlayer(x, y);
 
         pos[0] = x;
         pos[1] = y;
@@ -257,5 +258,13 @@ public class MapRender : MonoBehaviour
 
     private int PosToState(int[] pos) {
         return pos[0] * col + pos[1];
+    }
+
+    private void UpdatePlayer(int x, int y) {
+        if (map[x, y] == 1 || map[x, y] == 3) {
+            isTerminated = true;
+        }
+
+        map[x, y] = 2;
     }
 }

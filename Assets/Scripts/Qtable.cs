@@ -32,6 +32,7 @@ public class Qtable : MonoBehaviour
     private float decay_rate = 0.0005f;
 
     private int currentState = 0;
+    private StepInfo info = new StepInfo();
 
     private void Awake() {
         initTable(qtable);
@@ -203,15 +204,28 @@ public class Qtable : MonoBehaviour
 
     private void test() {
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) {
-            currentState = MovePlayer(0, currentState).new_state;
+            info = MovePlayer(0, info.new_state);
         } else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S)) {
-            currentState = MovePlayer(1, currentState).new_state;
+            info = MovePlayer(1, info.new_state);
         } else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) {
-            currentState = MovePlayer(2, currentState).new_state;
+            info = MovePlayer(2, info.new_state);
         } else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W)) {
-            currentState = MovePlayer(3, currentState).new_state;
+            info = MovePlayer(3, info.new_state);
+        }
+
+        if (info.terminated) {
+            ResetMap();
         }
 
         // Debug.Log("currentState: " + currentState);
+    }
+
+    private void ResetMap() {
+        map.ResetMap();
+        info.new_state = 0;
+        // info.reward = 0;
+        info.terminated = false;
+        info.truncated = false;
+        info.info = null;
     }
 }
